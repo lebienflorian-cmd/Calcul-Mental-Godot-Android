@@ -27,7 +27,7 @@ func _build_ui() -> void:
 	title.offset_left = 16
 	title.offset_right = -16
 	title.offset_top = 16
-	title.offset_bottom = 110
+	title.offset_bottom = 140
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
@@ -35,8 +35,8 @@ func _build_ui() -> void:
 	scroll = ScrollContainer.new()
 	scroll.anchor_right = 1.0
 	scroll.anchor_bottom = 1.0
-	scroll.offset_top = 120
-	scroll.offset_bottom = -110
+	scroll.offset_top = 170
+	scroll.offset_bottom = -220
 	scroll.offset_left = 20
 	scroll.offset_right = -20
 	add_child(scroll)
@@ -75,32 +75,45 @@ func _build_ui() -> void:
 		_toast("Options enregistrées")
 	)
 	save_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	save_btn.custom_minimum_size = Vector2(0, 80)
+	save_btn.custom_minimum_size = Vector2(0, 320)
 	bottom.add_child(save_btn)
 
 	var back_btn := _make_btn("← Retour", ThemeManager.SURFACE_2, func():
 		AudioManager.play_sfx("back")
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
 	)
 	back_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	back_btn.custom_minimum_size = Vector2(0, 80)
+	back_btn.custom_minimum_size = Vector2(0, 320)
 	bottom.add_child(back_btn)
+
+
+func _go_back() -> void:
+	SceneRouter.back("res://scenes/MainMenu.tscn")
 
 # ============================================================
 # Sections
 # ============================================================
 func _section(title: String) -> VBoxContainer:
 	var pc := PanelContainer.new()
-	pc.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 12))
+	pc.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 20))
 	content_vb.add_child(pc)
+	var root := VBoxContainer.new()
+	root.add_theme_constant_override("separation", 12)
+	pc.add_child(root)
+	var header_btn := Button.new()
+	header_btn.text = "▾  " + title
+	header_btn.add_theme_color_override("font_color", ThemeManager.ACCENT)
+	header_btn.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
+	header_btn.add_theme_stylebox_override("normal", ThemeManager.make_button_style(ThemeManager.SURFACE_2, 16))
+	header_btn.add_theme_stylebox_override("hover", ThemeManager.make_button_style(ThemeManager.BORDER, 16))
+	root.add_child(header_btn)
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
-	pc.add_child(vb)
-	var lbl := Label.new()
-	lbl.text = title
-	lbl.add_theme_color_override("font_color", ThemeManager.ACCENT)
-	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
-	vb.add_child(lbl)
+	vb.add_theme_constant_override("separation", 12)
+	root.add_child(vb)
+	header_btn.pressed.connect(func():
+		vb.visible = not vb.visible
+		header_btn.text = ("▾  " if vb.visible else "▸  ") + title
+	)
 	return vb
 
 func _build_section_profil() -> void:
@@ -113,7 +126,7 @@ func _build_section_profil() -> void:
 	var name_lbl := Label.new()
 	name_lbl.text = ProfileManager.current_profile
 	name_lbl.add_theme_color_override("font_color", ThemeManager.TEXT)
-	name_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	name_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(name_lbl)
@@ -153,7 +166,7 @@ func _build_section_mode() -> void:
 	var lbl := Label.new()
 	lbl.text = GameState.MODE_NAMES[GameState.options.mode]
 	lbl.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
-	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(lbl)
@@ -263,7 +276,7 @@ func _add_bool_field(parent: Node, label: String, opt_key: String) -> void:
 	cb.text = label
 	cb.button_pressed = GameState.options[opt_key]
 	cb.add_theme_color_override("font_color", ThemeManager.TEXT)
-	cb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	cb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_SMALL * 4.0)))
 	cb.toggled.connect(func(p): GameState.set_option(opt_key, p))
 	parent.add_child(cb)
 
@@ -274,7 +287,7 @@ func _add_int_field(parent: Node, label: String, opt_key: String, mn: int, mx: i
 	var lbl := Label.new()
 	lbl.text = label
 	lbl.add_theme_color_override("font_color", ThemeManager.TEXT)
-	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_SMALL * 4.0)))
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(lbl)
 	var minus := _make_btn("▼", ThemeManager.SURFACE_2, Callable())
@@ -283,7 +296,7 @@ func _add_int_field(parent: Node, label: String, opt_key: String, mn: int, mx: i
 	var value_lbl := Label.new()
 	value_lbl.text = str(GameState.options[opt_key])
 	value_lbl.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
-	value_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	value_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	value_lbl.custom_minimum_size = Vector2(80, 0)
 	value_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hb.add_child(value_lbl)
@@ -310,7 +323,7 @@ func _add_enum_field(parent: Node, label: String, opt_key: String, choices: Arra
 	var lbl := Label.new()
 	lbl.text = label
 	lbl.add_theme_color_override("font_color", ThemeManager.TEXT)
-	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_SMALL * 4.0)))
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(lbl)
 	var current = GameState.options[opt_key]
@@ -327,7 +340,7 @@ func _add_enum_field(parent: Node, label: String, opt_key: String, choices: Arra
 	var val_lbl := Label.new()
 	val_lbl.text = str(choices[idx])
 	val_lbl.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
-	val_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	val_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_SMALL * 4.0)))
 	val_lbl.custom_minimum_size = Vector2(120, 0)
 	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hb.add_child(val_lbl)
@@ -347,9 +360,9 @@ func _apply_enum(opt_key: String, choices: Array, idx: int) -> void:
 func _make_btn(label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 48)
+	b.custom_minimum_size = Vector2(0, 192)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_SMALL * 4.0)))
 	b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(color, 10))
 	b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(color.lightened(0.1), 10))
 	b.add_theme_stylebox_override("pressed",ThemeManager.make_button_style(color.darkened(0.15), 10))
@@ -389,11 +402,11 @@ func _modal_text(prompt: String, initial: String, on_ok: Callable) -> void:
 	var l := Label.new()
 	l.text = prompt
 	l.add_theme_color_override("font_color", ThemeManager.TEXT)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	vb.add_child(l)
 	var le := LineEdit.new()
 	le.text = initial
-	le.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	le.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	vb.add_child(le)
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", 8)
@@ -416,11 +429,11 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			_go_back()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		_go_back()
 
 func _toast(msg: String) -> void:
 	var layer := CanvasLayer.new()
@@ -439,7 +452,7 @@ func _toast(msg: String) -> void:
 	var l := Label.new()
 	l.text = msg
 	l.add_theme_color_override("font_color", ThemeManager.TEXT)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_SMALL * 4.0)))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pc.add_child(l)
 	var tw := create_tween()

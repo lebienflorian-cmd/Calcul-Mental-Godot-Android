@@ -8,6 +8,7 @@ const FADE_DURATION := 0.35
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
 var _busy := false
+var _history: Array[String] = []
 
 func _ready() -> void:
 	_fade_layer = CanvasLayer.new()
@@ -22,6 +23,12 @@ func _ready() -> void:
 
 func goto(scene_path: String) -> void:
 	if _busy: return
+	var current := ""
+	var tree := get_tree()
+	if tree.current_scene != null:
+		current = tree.current_scene.scene_file_path
+	if current != "" and current != scene_path:
+		_history.append(current)
 	_busy = true
 	# Fade in (vers noir)
 	var tw := create_tween()
@@ -34,3 +41,11 @@ func goto(scene_path: String) -> void:
 	tw2.tween_property(_fade_rect, "color", Color(0, 0, 0, 0), FADE_DURATION)
 	await tw2.finished
 	_busy = false
+
+func back(fallback_scene: String = "res://scenes/MainMenu.tscn") -> void:
+	if _busy: return
+	if _history.is_empty():
+		goto(fallback_scene)
+		return
+	var target := _history.pop_back()
+	goto(target)
