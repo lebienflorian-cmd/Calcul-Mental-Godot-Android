@@ -62,16 +62,16 @@ func _build_ui() -> void:
 	title.anchor_right = 1.0
 	title.offset_left = 16
 	title.offset_right = -16
-	title.offset_top = 16
-	title.offset_bottom = 80
+	title.offset_top = 28
+	title.offset_bottom = 130
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
 	_scroll = ScrollContainer.new()
 	_scroll.anchor_right = 1.0
 	_scroll.anchor_bottom = 1.0
-	_scroll.offset_top = 90
-	_scroll.offset_bottom = -90
+	_scroll.offset_top = 160
+	_scroll.offset_bottom = -220
 	_scroll.offset_left = 20
 	_scroll.offset_right = -20
 	add_child(_scroll)
@@ -93,16 +93,16 @@ func _build_ui() -> void:
 	back.anchor_top = 1.0
 	back.anchor_bottom = 1.0
 	back.offset_left = -200
-	back.offset_top = -76
+	back.offset_top = -180
 	back.offset_right = -20
-	back.offset_bottom = -16
+	back.offset_bottom = -24
 	back.add_theme_color_override("font_color", ThemeManager.TEXT)
-	back.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	back.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	back.add_theme_stylebox_override("normal", ThemeManager.make_button_style(ThemeManager.SURFACE_2, 10))
 	back.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(ThemeManager.BORDER, 10))
 	back.pressed.connect(func():
 		AudioManager.play_sfx("back")
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.goto_back()
 	)
 	add_child(back)
 
@@ -117,13 +117,13 @@ func _add_section(parent: Node, title: String, body: String) -> void:
 	var lbl_title := Label.new()
 	lbl_title.text = title
 	lbl_title.add_theme_color_override("font_color", ThemeManager.ACCENT)
-	lbl_title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	lbl_title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	vb.add_child(lbl_title)
 
 	var lbl_body := Label.new()
 	lbl_body.text = body
 	lbl_body.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	lbl_body.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	lbl_body.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	lbl_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(lbl_body)
 
@@ -134,8 +134,8 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.goto_back()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.goto_back()

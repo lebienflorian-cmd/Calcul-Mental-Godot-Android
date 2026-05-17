@@ -32,16 +32,16 @@ func _build_ui() -> void:
 	title.anchor_right = 1.0
 	title.offset_left = 16
 	title.offset_right = -16
-	title.offset_top = 16
-	title.offset_bottom = 80
+	title.offset_top = 28
+	title.offset_bottom = 130
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
 	_scroll = ScrollContainer.new()
 	_scroll.anchor_right = 1.0
 	_scroll.anchor_bottom = 1.0
-	_scroll.offset_top = 90
-	_scroll.offset_bottom = -90
+	_scroll.offset_top = 160
+	_scroll.offset_bottom = -220
 	_scroll.offset_left = 20
 	_scroll.offset_right = -20
 	add_child(_scroll)
@@ -63,7 +63,7 @@ func _build_ui() -> void:
 	mode_label = Label.new()
 	mode_label.text = GameState.MODE_NAMES[current_mode]
 	mode_label.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
-	mode_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	mode_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	mode_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sel_hb.add_child(mode_label)
@@ -81,7 +81,7 @@ func _build_ui() -> void:
 	profile_label = Label.new()
 	profile_label.text = "Profil : %s" % ProfileManager.current_profile
 	profile_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	profile_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	profile_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	profile_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prof_hb.add_child(profile_label)
@@ -94,7 +94,7 @@ func _build_ui() -> void:
 	daily_best_label = Label.new()
 	daily_best_label.text = ""
 	daily_best_label.add_theme_color_override("font_color", ThemeManager.SUCCESS)
-	daily_best_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	daily_best_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE * 4))
 	daily_best_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	best_panel.add_child(daily_best_label)
 
@@ -107,7 +107,7 @@ func _build_ui() -> void:
 	var graph_title := Label.new()
 	graph_title.text = "Progression (meilleurs du jour)"
 	graph_title.add_theme_color_override("font_color", ThemeManager.ACCENT)
-	graph_title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	graph_title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	graph_vb.add_child(graph_title)
 	graph_node = ScoreGraph.new()
 	graph_node.custom_minimum_size = Vector2(0, 220)
@@ -124,7 +124,7 @@ func _build_ui() -> void:
 	var hdr_lbl := Label.new()
 	hdr_lbl.text = "Historique des sessions"
 	hdr_lbl.add_theme_color_override("font_color", ThemeManager.ACCENT)
-	hdr_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	hdr_lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	table_vb.add_child(hdr_lbl)
 
 	# En-têtes de table
@@ -150,8 +150,8 @@ func _build_ui() -> void:
 	bottom.anchor_bottom = 1.0
 	bottom.offset_left = 20
 	bottom.offset_right = -20
-	bottom.offset_top = -76
-	bottom.offset_bottom = -16
+	bottom.offset_top = -180
+	bottom.offset_bottom = -24
 	bottom.add_theme_constant_override("separation", 12)
 	add_child(bottom)
 
@@ -160,7 +160,7 @@ func _build_ui() -> void:
 	bottom.add_child(clear_btn)
 
 	var back := _make_btn("← Retour", ThemeManager.SURFACE_2, func():
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.goto_back()
 	)
 	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(back)
@@ -169,7 +169,7 @@ func _hdr_cell(parent: Node, text: String, weight: int) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_color_override("font_color", ThemeManager.ACCENT)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.size_flags_stretch_ratio = float(weight)
 	parent.add_child(l)
@@ -178,7 +178,7 @@ func _row_cell(parent: Node, text: String, color: Color, weight: int) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_color_override("font_color", color)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.size_flags_stretch_ratio = float(weight)
 	parent.add_child(l)
@@ -186,9 +186,9 @@ func _row_cell(parent: Node, text: String, color: Color, weight: int) -> void:
 func _make_btn(label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 56)
+	b.custom_minimum_size = Vector2(0, 224)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(color, 10))
 	b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(color.lightened(0.1), 10))
 	b.add_theme_stylebox_override("pressed",ThemeManager.make_button_style(color.darkened(0.15), 10))
@@ -268,7 +268,7 @@ func _toast(msg: String) -> void:
 	var l := Label.new()
 	l.text = msg
 	l.add_theme_color_override("font_color", ThemeManager.TEXT)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pc.add_child(l)
 	var tw := create_tween()
@@ -283,11 +283,11 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.goto_back()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.goto_back()
 
 # ============================================================
 # Sous-classe : graphique simple
