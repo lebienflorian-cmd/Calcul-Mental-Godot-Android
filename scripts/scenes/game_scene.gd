@@ -79,7 +79,7 @@ func _build_ui() -> void:
 	add_child(top_bar)
 
 	var top_hb := HBoxContainer.new()
-	top_hb.add_theme_constant_override("separation", 16)
+	top_hb.add_theme_constant_override("separation", 28)
 	top_bar.add_child(top_hb)
 
 	pause_btn = Button.new()
@@ -94,15 +94,17 @@ func _build_ui() -> void:
 
 	top_label = Label.new()
 	top_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	top_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	top_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
 	top_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	top_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top_hb.add_child(top_label)
 
 	top_right_label = Label.new()
 	top_right_label.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
 	top_right_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
 	top_right_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	top_right_label.custom_minimum_size = Vector2(ThemeManager.scaled(180), 0)
 	top_hb.add_child(top_right_label)
 
 	# Panneau calcul — premier tiers de l'écran (sous la barre)
@@ -125,7 +127,7 @@ func _build_ui() -> void:
 	var hdr := Label.new()
 	hdr.text = "Calculez mentalement :"
 	hdr.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	hdr.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	hdr.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
 	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	calc_vb.add_child(hdr)
 
@@ -173,8 +175,8 @@ func _build_ui() -> void:
 	second_panel.add_child(second_label)
 
 	# Champ de réponse + bouton valider (+ bouton vocal si mode audio)
-	var ans_top := vh * 0.49
-	var ans_bot := vh * 0.62
+	var ans_top := vh * 0.45
+	var ans_bot := vh * 0.60
 	var ans_row := HBoxContainer.new()
 	ans_row.anchor_left = 0.0
 	ans_row.anchor_right = 1.0
@@ -226,7 +228,7 @@ func _build_ui() -> void:
 	VoiceManager.tts_finished.connect(_on_tts_finished)
 
 	# Clavier numérique tactile — ancré en bas, taille proportionnelle
-	var kpad_top := vh * 0.64
+	var kpad_top := vh * 0.61
 	var kpad_bot := vh * 0.98
 	var kpad_w   := vw - hm * 2.0
 	var kpad_h   := kpad_bot - kpad_top

@@ -33,22 +33,22 @@ func _build_ui() -> void:
 	root.anchor_bottom = 1.0
 	root.offset_left = margin
 	root.offset_right = -margin
-	root.offset_top = 60
-	root.offset_bottom = -40
-	root.add_theme_constant_override("separation", 14)
+	root.offset_top = 80
+	root.offset_bottom = -60
+	root.add_theme_constant_override("separation", 22)
 	add_child(root)
 
 	# Titre
 	_title_label = Label.new()
 	_title_label.text = "🧮  Calcul Mental"
 	_title_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	_title_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
+	_title_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE * 3))
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(_title_label)
 
 	# Espacement
 	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 20)
+	spacer.custom_minimum_size = Vector2(0, 80)
 	root.add_child(spacer)
 
 	# Boutons principaux
@@ -57,6 +57,7 @@ func _build_ui() -> void:
 	_add_menu_button(root, "📖  Règles du jeu", ThemeManager.SURFACE_2, _on_rules)
 	_add_menu_button(root, "📊  Scores",        ThemeManager.SURFACE_2, _on_scores)
 	_add_menu_button(root, "✕  Quitter",        ThemeManager.SURFACE_2, _on_quit)
+	root.add_spacer(false)
 
 	# Profil affiché en bas
 	var prof := Label.new()
@@ -85,9 +86,9 @@ func _build_ui() -> void:
 func _add_menu_button(parent: Node, label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 64)
+	b.custom_minimum_size = Vector2(0, 160)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
 	b.add_theme_stylebox_override("normal",  ThemeManager.make_button_style(color, 12))
 	b.add_theme_stylebox_override("hover",   ThemeManager.make_button_style(color.lightened(0.1), 12))
 	b.add_theme_stylebox_override("pressed", ThemeManager.make_button_style(color.darkened(0.15), 12))
