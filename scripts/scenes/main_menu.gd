@@ -42,13 +42,13 @@ func _build_ui() -> void:
 	_title_label = Label.new()
 	_title_label.text = "🧮  Calcul Mental"
 	_title_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	_title_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
+	_title_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE * 3))
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(_title_label)
 
 	# Espacement
 	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 20)
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(spacer)
 
 	# Boutons principaux
@@ -85,9 +85,9 @@ func _build_ui() -> void:
 func _add_menu_button(parent: Node, label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 64)
+	b.custom_minimum_size = Vector2(0, 160)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE * 2))
 	b.add_theme_stylebox_override("normal",  ThemeManager.make_button_style(color, 12))
 	b.add_theme_stylebox_override("hover",   ThemeManager.make_button_style(color.lightened(0.1), 12))
 	b.add_theme_stylebox_override("pressed", ThemeManager.make_button_style(color.darkened(0.15), 12))
@@ -200,6 +200,7 @@ func _input(event: InputEvent) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		get_viewport().set_input_as_handled()
 		_confirm_quit()
 
 func _confirm_quit() -> void:

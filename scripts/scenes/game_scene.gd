@@ -59,7 +59,7 @@ func _build_ui() -> void:
 	var vw  := vp.x
 	var vh  := vp.y
 	var hm  := maxf(16.0, vw * 0.04)
-	var top_h := maxf(60.0, vh * 0.07)
+	var top_h := maxf(84.0, vh * 0.09)
 
 	# Fond
 	var bg := ColorRect.new()
@@ -79,7 +79,7 @@ func _build_ui() -> void:
 	add_child(top_bar)
 
 	var top_hb := HBoxContainer.new()
-	top_hb.add_theme_constant_override("separation", 16)
+	top_hb.add_theme_constant_override("separation", 24)
 	top_bar.add_child(top_hb)
 
 	pause_btn = Button.new()
@@ -94,11 +94,12 @@ func _build_ui() -> void:
 
 	top_label = Label.new()
 	top_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	top_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	top_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
 	top_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top_hb.add_child(top_label)
 
+	top_hb.add_spacer(false)
 	top_right_label = Label.new()
 	top_right_label.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
 	top_right_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
@@ -125,7 +126,7 @@ func _build_ui() -> void:
 	var hdr := Label.new()
 	hdr.text = "Calculez mentalement :"
 	hdr.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	hdr.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	hdr.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
 	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	calc_vb.add_child(hdr)
 
@@ -305,7 +306,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			_on_pause()
+			SceneRouter.goto_back()
 		elif event.keycode == KEY_SPACE:
 			_on_pause()
 		elif event.keycode == KEY_Q:
@@ -490,3 +491,8 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if pause_overlay != null: return
 		_on_pause()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		get_viewport().set_input_as_handled()
+		SceneRouter.goto_back()

@@ -35,8 +35,8 @@ func _build_ui() -> void:
 	title.anchor_right = 1.0
 	title.offset_left = 16
 	title.offset_right = -16
-	title.offset_top = 16
-	title.offset_bottom = 80
+	title.offset_top = 28
+	title.offset_bottom = 130
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
@@ -44,8 +44,8 @@ func _build_ui() -> void:
 	_scroll = ScrollContainer.new()
 	_scroll.anchor_right = 1.0
 	_scroll.anchor_bottom = 1.0
-	_scroll.offset_top = 90
-	_scroll.offset_bottom = -90
+	_scroll.offset_top = 160
+	_scroll.offset_bottom = -220
 	_scroll.offset_left = 20
 	_scroll.offset_right = -20
 	add_child(_scroll)
@@ -67,8 +67,8 @@ func _build_ui() -> void:
 	bottom.anchor_bottom = 1.0
 	bottom.offset_left = 20
 	bottom.offset_right = -20
-	bottom.offset_top = -76
-	bottom.offset_bottom = -16
+	bottom.offset_top = -180
+	bottom.offset_bottom = -24
 	bottom.add_theme_constant_override("separation", 12)
 	add_child(bottom)
 
@@ -111,7 +111,7 @@ func _build_summary_panel(parent: Node) -> void:
 		var nb := Label.new()
 		nb.text = "★  Nouveau meilleur du jour !"
 		nb.add_theme_color_override("font_color", ThemeManager.SUCCESS)
-		nb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+		nb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 		nb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		vb.add_child(nb)
 
@@ -134,12 +134,12 @@ func _add_stat(parent: Node, label: String, value: String) -> void:
 	var l := Label.new()
 	l.text = label
 	l.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	parent.add_child(l)
 	var v := Label.new()
 	v.text = value
 	v.add_theme_color_override("font_color", ThemeManager.TEXT)
-	v.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	v.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	parent.add_child(v)
 
 # ---- Filtre lent ----
@@ -153,7 +153,7 @@ func _build_slow_filter(parent: Node) -> void:
 	var l := Label.new()
 	l.text = "Top % réponses les plus lentes :"
 	l.add_theme_color_override("font_color", ThemeManager.TEXT)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(l)
 	hb.add_child(_make_btn("▼", ThemeManager.SURFACE_2, func():
@@ -164,7 +164,7 @@ func _build_slow_filter(parent: Node) -> void:
 	v.name = "ValueLabel"
 	v.text = "%d %%" % slow_percent
 	v.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
-	v.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	v.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	v.custom_minimum_size = Vector2(70, 0)
 	v.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hb.add_child(v)
@@ -202,7 +202,7 @@ func _hdr_cell(parent: Node, text: String, weight: int) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_color_override("font_color", ThemeManager.ACCENT)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.size_flags_stretch_ratio = float(weight)
 	parent.add_child(l)
@@ -245,7 +245,7 @@ func _row_cell(parent: Node, text: String, color: Color, weight: int) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_color_override("font_color", color)
-	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL * 4))
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.size_flags_stretch_ratio = float(weight)
 	parent.add_child(l)
@@ -259,9 +259,9 @@ func _fmt_num(n) -> String:
 func _make_btn(label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 56)
+	b.custom_minimum_size = Vector2(0, 224)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED * 4))
 	b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(color, 10))
 	b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(color.lightened(0.1), 10))
 	b.add_theme_stylebox_override("pressed",ThemeManager.make_button_style(color.darkened(0.15), 10))
