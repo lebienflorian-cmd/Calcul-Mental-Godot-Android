@@ -160,7 +160,7 @@ func _build_ui() -> void:
 	bottom.add_child(clear_btn)
 
 	var back := _make_btn("← Retour", ThemeManager.SURFACE_2, func():
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
 	)
 	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(back)
@@ -283,11 +283,11 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.back("res://scenes/MainMenu.tscn")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
 
 # ============================================================
 # Sous-classe : graphique simple

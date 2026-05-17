@@ -85,7 +85,7 @@ func _build_ui() -> void:
 	bottom.add_child(options)
 
 	var menu := _make_btn("🏠  Menu", ThemeManager.SURFACE_2, func():
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
 	)
 	menu.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(menu)
@@ -278,8 +278,8 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.back("res://scenes/MainMenu.tscn")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
