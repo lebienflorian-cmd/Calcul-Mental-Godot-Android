@@ -10,6 +10,7 @@ var table_container: VBoxContainer
 var mode_label: Label
 var profile_label: Label
 var daily_best_label: Label
+var _scroll: ScrollContainer
 
 func _ready() -> void:
 	current_mode = GameState.options.mode
@@ -27,28 +28,28 @@ func _build_ui() -> void:
 	title.text = "📊  Scores & Historique"
 	title.add_theme_color_override("font_color", ThemeManager.TEXT)
 	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
-	title.anchor_left = 0.5
-	title.anchor_right = 0.5
-	title.offset_left = -360
-	title.offset_right = 360
+	title.anchor_left = 0.0
+	title.anchor_right = 1.0
+	title.offset_left = 16
+	title.offset_right = -16
 	title.offset_top = 16
 	title.offset_bottom = 80
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
-	var scroll := ScrollContainer.new()
-	scroll.anchor_right = 1.0
-	scroll.anchor_bottom = 1.0
-	scroll.offset_top = 90
-	scroll.offset_bottom = -90
-	scroll.offset_left = 20
-	scroll.offset_right = -20
-	add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.anchor_right = 1.0
+	_scroll.anchor_bottom = 1.0
+	_scroll.offset_top = 90
+	_scroll.offset_bottom = -90
+	_scroll.offset_left = 20
+	_scroll.offset_right = -20
+	add_child(_scroll)
 
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 14)
-	scroll.add_child(vb)
+	_scroll.add_child(vb)
 
 	# Sélecteurs
 	var sel_panel := PanelContainer.new()
@@ -243,12 +244,12 @@ func _refresh_all() -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 		table_container.add_child(row)
-		_row_cell(row, str(s.date),                      ThemeManager.TEXT, 3)
-		_row_cell(row, str(s.level),                     ThemeManager.TEXT_DIM, 1)
-		_row_cell(row, str(s.calculations),              ThemeManager.TEXT_DIM, 1)
-		_row_cell(row, str(s.correct),                   ThemeManager.SUCCESS, 1)
-		_row_cell(row, "%.0f%%" % (s.accuracy * 100.0),  ThemeManager.TEXT_DIM, 1)
-		_row_cell(row, str(s.score),                     ThemeManager.ACCENT_2, 1)
+		_row_cell(row, str(s.get("date", "—")),                                    ThemeManager.TEXT, 3)
+		_row_cell(row, str(s.get("level", 0)),                                      ThemeManager.TEXT_DIM, 1)
+		_row_cell(row, str(s.get("calculations", s.get("total", "?"))),             ThemeManager.TEXT_DIM, 1)
+		_row_cell(row, str(s.get("correct", 0)),                                    ThemeManager.SUCCESS, 1)
+		_row_cell(row, "%.0f%%" % (float(s.get("accuracy", 0.0)) * 100.0),          ThemeManager.TEXT_DIM, 1)
+		_row_cell(row, str(s.get("score", 0)),                                      ThemeManager.ACCENT_2, 1)
 
 func _toast(msg: String) -> void:
 	var layer := CanvasLayer.new()
@@ -276,9 +277,17 @@ func _toast(msg: String) -> void:
 	tw.tween_callback(func(): layer.queue_free())
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE:
+	if event is InputEventScreenDrag:
+		_scroll.scroll_vertical -= int(event.relative.y)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
+			get_viewport().set_input_as_handled()
 			SceneRouter.goto("res://scenes/MainMenu.tscn")
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		SceneRouter.goto("res://scenes/MainMenu.tscn")
 
 # ============================================================
 # Sous-classe : graphique simple
@@ -305,11 +314,11 @@ class ScoreGraph extends Control:
 			draw_line(Vector2(40, y), Vector2(sz.x - 10, y), Color(ThemeManager.BORDER.r, ThemeManager.BORDER.g, ThemeManager.BORDER.b, 0.4), 1)
 		# Points et lignes
 		var n := points.size()
-		var step := (sz.x - 50) / max(1, n - 1) if n > 1 else 0
+		var step: float = (sz.x - 50) / float(max(1, n - 1)) if n > 1 else 0.0
 		var prev := Vector2.ZERO
 		for i in n:
 			var p = points[i]
-			var x := 40.0 + float(i) * step
+			var x: float = 40.0 + float(i) * step
 			var y := sz.y - 10 - (sz.y - 30) * float(int(p.score)) / float(max_score)
 			if i > 0:
 				draw_line(prev, Vector2(x, y), ThemeManager.ACCENT, 2)

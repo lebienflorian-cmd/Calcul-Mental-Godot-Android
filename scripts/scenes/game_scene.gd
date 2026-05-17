@@ -55,6 +55,12 @@ func _ready() -> void:
 # UI BUILD
 # ============================================================
 func _build_ui() -> void:
+	var vp  := get_viewport_rect().size
+	var vw  := vp.x
+	var vh  := vp.y
+	var hm  := maxf(16.0, vw * 0.04)
+	var top_h := maxf(60.0, vh * 0.07)
+
 	# Fond
 	var bg := ColorRect.new()
 	bg.color = ThemeManager.BG
@@ -63,12 +69,12 @@ func _build_ui() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
-	# Barre supérieure
+	# Barre supérieure — pleine largeur
 	top_bar = PanelContainer.new()
 	top_bar.anchor_left = 0.0
 	top_bar.anchor_right = 1.0
 	top_bar.offset_top = 0
-	top_bar.offset_bottom = 70
+	top_bar.offset_bottom = top_h
 	top_bar.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 0))
 	add_child(top_bar)
 
@@ -76,10 +82,9 @@ func _build_ui() -> void:
 	top_hb.add_theme_constant_override("separation", 16)
 	top_bar.add_child(top_hb)
 
-	# Bouton pause à gauche
 	pause_btn = Button.new()
 	pause_btn.text = "‖"
-	pause_btn.custom_minimum_size = Vector2(56, 56)
+	pause_btn.custom_minimum_size = Vector2(maxf(64.0, top_h), 0)
 	pause_btn.add_theme_color_override("font_color", ThemeManager.TEXT)
 	pause_btn.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
 	pause_btn.add_theme_stylebox_override("normal", ThemeManager.make_button_style(ThemeManager.SURFACE_2, 12))
@@ -100,15 +105,16 @@ func _build_ui() -> void:
 	top_right_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top_hb.add_child(top_right_label)
 
-	# Panneau calcul (centre)
+	# Panneau calcul — premier tiers de l'écran (sous la barre)
+	var calc_top := top_h + vh * 0.02
+	var calc_bot := top_h + vh * 0.30
 	calc_panel = PanelContainer.new()
-	calc_panel.anchor_left = 0.5
-	calc_panel.anchor_right = 0.5
-	calc_panel.anchor_top = 0.0
-	calc_panel.offset_top = 110
-	calc_panel.offset_bottom = 260
-	calc_panel.offset_left = -360
-	calc_panel.offset_right = 360
+	calc_panel.anchor_left = 0.0
+	calc_panel.anchor_right = 1.0
+	calc_panel.offset_left = hm
+	calc_panel.offset_right = -hm
+	calc_panel.offset_top = calc_top
+	calc_panel.offset_bottom = calc_bot
 	calc_panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 18))
 	add_child(calc_panel)
 
@@ -129,36 +135,33 @@ func _build_ui() -> void:
 	calc_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(72))
 	calc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	calc_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	calc_label.custom_minimum_size = Vector2(0, 100)
+	calc_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	calc_vb.add_child(calc_label)
 
-	# Gros label central pour anzan (initialement caché)
+	# Label anzan (caché par défaut, superposé au panneau calcul)
 	anzan_label = Label.new()
 	anzan_label.text = ""
 	anzan_label.add_theme_color_override("font_color", ThemeManager.ACCENT)
 	anzan_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(180))
 	anzan_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	anzan_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	anzan_label.anchor_left = 0.5
-	anzan_label.anchor_right = 0.5
-	anzan_label.anchor_top = 0.5
-	anzan_label.anchor_bottom = 0.5
-	anzan_label.offset_left = -240
-	anzan_label.offset_right = 240
-	anzan_label.offset_top = -120
-	anzan_label.offset_bottom = 120
+	anzan_label.anchor_left = 0.0
+	anzan_label.anchor_right = 1.0
+	anzan_label.offset_top = calc_top
+	anzan_label.offset_bottom = calc_bot
 	anzan_label.visible = false
 	add_child(anzan_label)
 
-	# Deuxième panneau (mode infernal)
+	# Panneau mode infernal — juste sous le panneau calcul
+	var second_top := calc_bot + vh * 0.01
+	var second_bot := second_top + vh * 0.09
 	second_panel = PanelContainer.new()
-	second_panel.anchor_left = 0.5
-	second_panel.anchor_right = 0.5
-	second_panel.anchor_top = 0.0
-	second_panel.offset_top = 280
-	second_panel.offset_bottom = 380
-	second_panel.offset_left = -360
-	second_panel.offset_right = 360
+	second_panel.anchor_left = 0.0
+	second_panel.anchor_right = 1.0
+	second_panel.offset_left = hm
+	second_panel.offset_right = -hm
+	second_panel.offset_top = second_top
+	second_panel.offset_bottom = second_bot
 	second_panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.ACCENT_2.darkened(0.5), 18))
 	second_panel.visible = false
 	add_child(second_panel)
@@ -169,18 +172,21 @@ func _build_ui() -> void:
 	second_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	second_panel.add_child(second_label)
 
-	# Champ de réponse + bouton valider
+	# Champ de réponse + bouton valider (+ bouton vocal si mode audio)
+	var ans_top := vh * 0.49
+	var ans_bot := vh * 0.62
 	var ans_row := HBoxContainer.new()
-	ans_row.anchor_left = 0.5
-	ans_row.anchor_right = 0.5
-	ans_row.offset_top = 400
-	ans_row.offset_bottom = 470
-	ans_row.offset_left = -360
-	ans_row.offset_right = 360
+	ans_row.anchor_left = 0.0
+	ans_row.anchor_right = 1.0
+	ans_row.offset_left = hm
+	ans_row.offset_right = -hm
+	ans_row.offset_top = ans_top
+	ans_row.offset_bottom = ans_bot
 	ans_row.add_theme_constant_override("separation", 10)
 	add_child(ans_row)
 
 	answer_input = LineEdit.new()
+	answer_input.virtual_keyboard_enabled = false
 	answer_input.placeholder_text = "Réponse"
 	answer_input.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	answer_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -189,57 +195,24 @@ func _build_ui() -> void:
 	var sb := ThemeManager.make_panel_style(ThemeManager.SURFACE_2, 12)
 	answer_input.add_theme_stylebox_override("normal", sb)
 	answer_input.add_theme_stylebox_override("focus",  ThemeManager.make_panel_style(ThemeManager.ACCENT.darkened(0.3), 12))
-	# Filtrage : on autorisera chiffres, signe moins, virgule/point
 	answer_input.text_submitted.connect(_on_submit)
 	ans_row.add_child(answer_input)
 
-	validate_btn = Button.new()
-	validate_btn.text = "✓"
-	validate_btn.custom_minimum_size = Vector2(80, 0)
-	validate_btn.add_theme_color_override("font_color", ThemeManager.TEXT)
-	validate_btn.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
-	validate_btn.add_theme_stylebox_override("normal", ThemeManager.make_button_style(ThemeManager.SUCCESS, 12))
-	validate_btn.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(ThemeManager.SUCCESS.lightened(0.1), 12))
-	validate_btn.pressed.connect(func(): _on_submit(answer_input.text))
-	ans_row.add_child(validate_btn)
+	var backspace_btn := Button.new()
+	backspace_btn.text = "⌫"
+	backspace_btn.custom_minimum_size = Vector2(104, 0)
+	backspace_btn.add_theme_color_override("font_color", ThemeManager.TEXT)
+	backspace_btn.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	backspace_btn.add_theme_stylebox_override("normal",  ThemeManager.make_button_style(ThemeManager.ERROR.darkened(0.3), 12))
+	backspace_btn.add_theme_stylebox_override("hover",   ThemeManager.make_button_style(ThemeManager.ERROR.darkened(0.1), 12))
+	backspace_btn.add_theme_stylebox_override("pressed", ThemeManager.make_button_style(ThemeManager.ERROR.darkened(0.5), 12))
+	backspace_btn.pressed.connect(func(): _on_keypad("⌫"))
+	ans_row.add_child(backspace_btn)
 
-	# Clavier numérique tactile
-	keypad_grid = GridContainer.new()
-	keypad_grid.columns = 3
-	keypad_grid.anchor_left = 0.5
-	keypad_grid.anchor_right = 0.5
-	keypad_grid.offset_top = 490
-	keypad_grid.offset_bottom = 770
-	keypad_grid.offset_left = -260
-	keypad_grid.offset_right = 260
-	keypad_grid.add_theme_constant_override("h_separation", 8)
-	keypad_grid.add_theme_constant_override("v_separation", 8)
-	add_child(keypad_grid)
-	for k in ["7","8","9","4","5","6","1","2","3","-","0","⌫"]:
-		var b := Button.new()
-		b.text = k
-		b.custom_minimum_size = Vector2(150, 80)
-		b.add_theme_color_override("font_color", ThemeManager.TEXT)
-		b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
-		var col := ThemeManager.SURFACE_2
-		if k == "⌫": col = ThemeManager.ERROR.darkened(0.3)
-		b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(col, 12))
-		b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(col.lightened(0.1), 12))
-		b.add_theme_stylebox_override("pressed", ThemeManager.make_button_style(col.darkened(0.2), 12))
-		var key := k
-		b.pressed.connect(func(): _on_keypad(key))
-		keypad_grid.add_child(b)
-
-	# Bouton micro (vocal)
+	# Bouton micro — dans la même rangée que la réponse
 	voice_btn = Button.new()
 	voice_btn.text = "🎤"
-	voice_btn.custom_minimum_size = Vector2(80, 80)
-	voice_btn.anchor_left = 1.0
-	voice_btn.anchor_right = 1.0
-	voice_btn.offset_left = -100
-	voice_btn.offset_right = -20
-	voice_btn.offset_top = 490
-	voice_btn.offset_bottom = 570
+	voice_btn.custom_minimum_size = Vector2(80, 0)
 	voice_btn.add_theme_color_override("font_color", ThemeManager.TEXT)
 	voice_btn.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
 	voice_btn.add_theme_stylebox_override("normal", ThemeManager.make_button_style(ThemeManager.ACCENT, 40))
@@ -248,9 +221,47 @@ func _build_ui() -> void:
 	voice_btn.visible = GameState.options.voice_input or GameState.options.mode == GameState.Mode.AUDIO
 	voice_btn.button_down.connect(_on_voice_down)
 	voice_btn.button_up.connect(_on_voice_up)
-	add_child(voice_btn)
+	ans_row.add_child(voice_btn)
 	VoiceManager.stt_result.connect(_on_stt_result)
 	VoiceManager.tts_finished.connect(_on_tts_finished)
+
+	# Clavier numérique tactile — ancré en bas, taille proportionnelle
+	var kpad_top := vh * 0.64
+	var kpad_bot := vh * 0.98
+	var kpad_w   := vw - hm * 2.0
+	var kpad_h   := kpad_bot - kpad_top
+	var btn_h    := maxf(48.0, (kpad_h - 8.0 * 3.0) / 4.0)
+	var btn_w    := maxf(80.0, (kpad_w - 8.0 * 2.0) / 3.0)
+
+	keypad_grid = GridContainer.new()
+	keypad_grid.columns = 3
+	keypad_grid.anchor_left = 0.0
+	keypad_grid.anchor_right = 1.0
+	keypad_grid.offset_left = hm
+	keypad_grid.offset_right = -hm
+	keypad_grid.offset_top = kpad_top
+	keypad_grid.offset_bottom = kpad_bot
+	keypad_grid.add_theme_constant_override("h_separation", 8)
+	keypad_grid.add_theme_constant_override("v_separation", 8)
+	add_child(keypad_grid)
+
+	for k in ["7","8","9","4","5","6","1","2","3","-","0","✓"]:
+		var b := Button.new()
+		b.text = k
+		b.custom_minimum_size = Vector2(btn_w, btn_h)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.size_flags_vertical   = Control.SIZE_EXPAND_FILL
+		b.add_theme_color_override("font_color", ThemeManager.TEXT)
+		b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+		var col := ThemeManager.SURFACE_2
+		if k == "✓": col = ThemeManager.SUCCESS
+		b.add_theme_stylebox_override("normal",  ThemeManager.make_button_style(col, 12))
+		b.add_theme_stylebox_override("hover",   ThemeManager.make_button_style(col.lightened(0.1), 12))
+		b.add_theme_stylebox_override("pressed", ThemeManager.make_button_style(col.darkened(0.2), 12))
+		var key: String = k
+		b.pressed.connect(func(): _on_keypad(key))
+		if k == "✓": validate_btn = b
+		keypad_grid.add_child(b)
 
 	# Hint
 	hint_label = Label.new()
@@ -292,8 +303,9 @@ func _init_handler() -> void:
 func _input(event: InputEvent) -> void:
 	if pause_overlay != null: return
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE:
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
+			get_viewport().set_input_as_handled()
+			_on_pause()
 		elif event.keycode == KEY_SPACE:
 			_on_pause()
 		elif event.keycode == KEY_Q:
@@ -305,6 +317,9 @@ func _on_keypad(k: String) -> void:
 	if k == "⌫":
 		if answer_input.text.length() > 0:
 			answer_input.text = answer_input.text.substr(0, answer_input.text.length() - 1)
+	elif k == "✓":
+		_on_submit(answer_input.text)
+		return
 	elif k == "-":
 		if not answer_input.text.begins_with("-"):
 			answer_input.text = "-" + answer_input.text
@@ -470,3 +485,8 @@ func _on_stt_result(text: String) -> void:
 func _on_tts_finished() -> void:
 	if mode_handler and mode_handler.has_method("on_tts_done"):
 		mode_handler.on_tts_done()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if pause_overlay != null: return
+		_on_pause()

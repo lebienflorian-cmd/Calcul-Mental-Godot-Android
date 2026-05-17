@@ -29,10 +29,10 @@ func _ready() -> void:
 
 func _on_size_changed() -> void:
 	var s := get_viewport().get_visible_rect().size
-	# Echelle basée sur le min entre largeur/hauteur ratio
-	var sx := s.x / 1280.0
-	var sy := s.y / 800.0
-	ui_scale = clamp(min(sx, sy), 0.5, 2.5)
+	if s.y > s.x:  # Portrait (Android)
+		ui_scale = clamp(s.x / 640.0, 0.5, 3.0)
+	else:           # Landscape / desktop
+		ui_scale = clamp(min(s.x / 1280.0, s.y / 800.0), 0.5, 3.0)
 
 func make_panel_style(color: Color = SURFACE, radius: int = 12) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()

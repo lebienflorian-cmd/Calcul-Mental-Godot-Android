@@ -22,12 +22,12 @@ func _build_ui() -> void:
 	title.text = "⚙  Options"
 	title.add_theme_color_override("font_color", ThemeManager.TEXT)
 	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
-	title.anchor_left = 0.5
-	title.anchor_right = 0.5
-	title.offset_left = -300
-	title.offset_right = 300
+	title.anchor_left = 0.0
+	title.anchor_right = 1.0
+	title.offset_left = 16
+	title.offset_right = -16
 	title.offset_top = 16
-	title.offset_bottom = 80
+	title.offset_bottom = 110
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
@@ -35,8 +35,8 @@ func _build_ui() -> void:
 	scroll = ScrollContainer.new()
 	scroll.anchor_right = 1.0
 	scroll.anchor_bottom = 1.0
-	scroll.offset_top = 90
-	scroll.offset_bottom = -90
+	scroll.offset_top = 120
+	scroll.offset_bottom = -110
 	scroll.offset_left = 20
 	scroll.offset_right = -20
 	add_child(scroll)
@@ -64,8 +64,8 @@ func _build_ui() -> void:
 	bottom.anchor_bottom = 1.0
 	bottom.offset_left = 20
 	bottom.offset_right = -20
-	bottom.offset_top = -76
-	bottom.offset_bottom = -16
+	bottom.offset_top = -106
+	bottom.offset_bottom = -12
 	bottom.add_theme_constant_override("separation", 12)
 	add_child(bottom)
 
@@ -75,6 +75,7 @@ func _build_ui() -> void:
 		_toast("Options enregistrées")
 	)
 	save_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	save_btn.custom_minimum_size = Vector2(0, 80)
 	bottom.add_child(save_btn)
 
 	var back_btn := _make_btn("← Retour", ThemeManager.SURFACE_2, func():
@@ -82,6 +83,7 @@ func _build_ui() -> void:
 		SceneRouter.goto("res://scenes/MainMenu.tscn")
 	)
 	back_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	back_btn.custom_minimum_size = Vector2(0, 80)
 	bottom.add_child(back_btn)
 
 # ============================================================
@@ -406,6 +408,19 @@ func _modal_text(prompt: String, initial: String, on_ok: Callable) -> void:
 	cancel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(cancel)
 	le.grab_focus()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenDrag:
+		scroll.scroll_vertical -= int(event.relative.y)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
+			get_viewport().set_input_as_handled()
+			SceneRouter.goto("res://scenes/MainMenu.tscn")
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		SceneRouter.goto("res://scenes/MainMenu.tscn")
 
 func _toast(msg: String) -> void:
 	var layer := CanvasLayer.new()

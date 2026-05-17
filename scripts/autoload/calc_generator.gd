@@ -57,14 +57,14 @@ func _generate_infernal() -> Dictionary:
 func _generate_classic() -> Dictionary:
 	for attempt in 50:
 		var d := _try_generate_classic()
-		if d != null and _validate(d):
+		if not d.is_empty() and _validate(d):
 			return d
 	# Fallback ultra-simple
 	var a := _rng.randi_range(2, 9)
 	var b := _rng.randi_range(2, 9)
 	return {"expr_str": "%d + %d" % [a, b], "value": float(a + b), "operands": [a, b], "ops": [OP_ADD]}
 
-func _try_generate_classic():
+func _try_generate_classic() -> Dictionary:
 	var ops_active := _active_ops()
 	if ops_active.is_empty():
 		ops_active = [OP_ADD]
@@ -112,12 +112,12 @@ func _try_generate_classic():
 		operands = _fix_no_borrow_sub(operands)
 
 	# Parenthèses (optionnel, sauf division)
-	var use_paren := GameState.options.parentheses and not (OP_DIV in ops) and n_operands >= 3
+	var use_paren: bool = bool(GameState.options.parentheses) and not (OP_DIV in ops) and n_operands >= 3
 	var expr_str := _build_expr(operands, ops, use_paren)
 	var value = _evaluate(operands, ops)
 
 	if typeof(value) != TYPE_FLOAT and typeof(value) != TYPE_INT:
-		return null
+		return {}
 
 	return {
 		"expr_str": expr_str,

@@ -42,6 +42,8 @@ const RULES_TEXT := [
 	},
 ]
 
+var _scroll: ScrollContainer
+
 func _ready() -> void:
 	_build_ui()
 
@@ -56,28 +58,28 @@ func _build_ui() -> void:
 	title.text = "📖  Règles du jeu"
 	title.add_theme_color_override("font_color", ThemeManager.TEXT)
 	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
-	title.anchor_left = 0.5
-	title.anchor_right = 0.5
-	title.offset_left = -300
-	title.offset_right = 300
+	title.anchor_left = 0.0
+	title.anchor_right = 1.0
+	title.offset_left = 16
+	title.offset_right = -16
 	title.offset_top = 16
 	title.offset_bottom = 80
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
-	var scroll := ScrollContainer.new()
-	scroll.anchor_right = 1.0
-	scroll.anchor_bottom = 1.0
-	scroll.offset_top = 90
-	scroll.offset_bottom = -90
-	scroll.offset_left = 20
-	scroll.offset_right = -20
-	add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.anchor_right = 1.0
+	_scroll.anchor_bottom = 1.0
+	_scroll.offset_top = 90
+	_scroll.offset_bottom = -90
+	_scroll.offset_left = 20
+	_scroll.offset_right = -20
+	add_child(_scroll)
 
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 14)
-	scroll.add_child(vb)
+	_scroll.add_child(vb)
 
 	for section in RULES_TEXT:
 		_add_section(vb, section.title, section.body)
@@ -126,6 +128,14 @@ func _add_section(parent: Node, title: String, body: String) -> void:
 	vb.add_child(lbl_body)
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE:
+	if event is InputEventScreenDrag:
+		_scroll.scroll_vertical -= int(event.relative.y)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
+			get_viewport().set_input_as_handled()
 			SceneRouter.goto("res://scenes/MainMenu.tscn")
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		SceneRouter.goto("res://scenes/MainMenu.tscn")

@@ -13,6 +13,7 @@ var _symbols: Array = []  # {pos: Vector2, vel: Vector2, char: String, alpha: fl
 const SYMBOLS_TEXT := ["1","2","3","4","5","6","7","8","9","+","−","×","÷","="]
 var _bg_style: int = 0  # 0 = fusion, 1 = bokeh
 var _scan_pos: float = 0.0
+var _quit_layer: CanvasLayer = null
 
 func _ready() -> void:
 	AudioManager.play_music("menu")
@@ -21,14 +22,17 @@ func _ready() -> void:
 	set_process(true)
 
 func _build_ui() -> void:
-	# Conteneur principal centré
+	var vp  := get_viewport_rect().size
+	var vw  := vp.x
+	var margin := maxf(20.0, vw * 0.05)
+	# Conteneur principal pleine largeur
 	var root := VBoxContainer.new()
-	root.anchor_left = 0.5
-	root.anchor_right = 0.5
+	root.anchor_left = 0.0
+	root.anchor_right = 1.0
 	root.anchor_top = 0.0
 	root.anchor_bottom = 1.0
-	root.offset_left = -260
-	root.offset_right = 260
+	root.offset_left = margin
+	root.offset_right = -margin
 	root.offset_top = 60
 	root.offset_bottom = -40
 	root.add_theme_constant_override("separation", 14)
@@ -42,17 +46,9 @@ func _build_ui() -> void:
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(_title_label)
 
-	# Sous-titre
-	var sub := Label.new()
-	sub.text = "Entraînement — 5 modes"
-	sub.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	sub.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	root.add_child(sub)
-
 	# Espacement
 	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 24)
+	spacer.custom_minimum_size = Vector2(0, 20)
 	root.add_child(spacer)
 
 	# Boutons principaux
@@ -117,7 +113,7 @@ func _on_scores() -> void:
 	SceneRouter.goto("res://scenes/ScoresScene.tscn")
 
 func _on_quit() -> void:
-	get_tree().quit()
+	_confirm_quit()
 
 func _on_toggle_bg() -> void:
 	_bg_style = (_bg_style + 1) % 2
@@ -196,10 +192,58 @@ func _draw() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE:
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
+			get_viewport().set_input_as_handled()
 			_on_quit()
 		elif event.keycode == KEY_F11 or event.keycode == KEY_F1:
 			_toggle_fullscreen()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_confirm_quit()
+
+func _confirm_quit() -> void:
+	if _quit_layer != null: return
+	AudioManager.play_sfx("click")
+	_quit_layer = CanvasLayer.new()
+	_quit_layer.layer = 100
+	add_child(_quit_layer)
+	var bg := ColorRect.new()
+	bg.color = Color(0, 0, 0, 0.65)
+	bg.anchor_right = 1.0
+	bg.anchor_bottom = 1.0
+	bg.mouse_filter = Control.MOUSE_FILTER_STOP
+	_quit_layer.add_child(bg)
+	var panel := PanelContainer.new()
+	panel.anchor_left = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -200
+	panel.offset_right = 200
+	panel.offset_top = -100
+	panel.offset_bottom = 100
+	panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 14))
+	_quit_layer.add_child(panel)
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 16)
+	panel.add_child(vb)
+	var l := Label.new()
+	l.text = "Quitter le jeu ?"
+	l.add_theme_color_override("font_color", ThemeManager.TEXT)
+	l.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(l)
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 12)
+	vb.add_child(hb)
+	var yes := _add_menu_button(hb, "✓  Oui", ThemeManager.ERROR, func(): get_tree().quit())
+	yes.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var no := _add_menu_button(hb, "✗  Non", ThemeManager.SURFACE_2, func():
+		_quit_layer.queue_free()
+		_quit_layer = null
+	)
+	no.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 func _toggle_fullscreen() -> void:
 	var w := DisplayServer.window_get_mode()

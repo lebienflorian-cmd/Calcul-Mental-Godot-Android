@@ -116,8 +116,9 @@ func daily_bests_history(mode: int) -> Array:
 	var data := load_all()
 	var out := []
 	for key in data.daily_bests.keys():
-		if key.ends_with("_m%d" % mode):
-			var date := key.substr(0, key.length() - ("_m%d" % mode).length())
+		var key_str: String = str(key)
+		if key_str.ends_with("_m%d" % mode):
+			var date: String = key_str.substr(0, key_str.length() - ("_m%d" % mode).length())
 			out.append({"date": date, "score": int(data.daily_bests[key])})
 	out.sort_custom(func(a, b): return a.date < b.date)
 	return out

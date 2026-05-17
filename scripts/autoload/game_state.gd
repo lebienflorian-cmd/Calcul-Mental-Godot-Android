@@ -126,7 +126,7 @@ func record_answer(expr: String, correct_val: float, given_val, time_ms: int, ok
 	})
 
 func compute_final_stats() -> Dictionary:
-	var total := session.answers.size()
+	var total: int = session.answers.size()
 	var correct := 0
 	var total_time := 0
 	for a in session.answers:
@@ -134,7 +134,7 @@ func compute_final_stats() -> Dictionary:
 		total_time += a.time_ms
 	var accuracy := 0.0 if total == 0 else float(correct) / float(total)
 	var avg_time := 0.0 if total == 0 else float(total_time) / float(total) / 1000.0
-	var elapsed := (Time.get_ticks_msec() - session.start_time) / 1000.0
+	var elapsed: float = (Time.get_ticks_msec() - int(session.start_time)) / 1000.0
 	var level: int = session.level
 	var score := 1000.0 * accuracy + 10.0 * correct + 20.0 * level - 5.0 * avg_time
 	score = max(0.0, score)
@@ -161,6 +161,13 @@ func options_to_dict() -> Dictionary:
 
 func options_from_dict(d: Dictionary) -> void:
 	for k in d.keys():
-		if options.has(k):
-			options[k] = d[k]
+		if not options.has(k):
+			continue
+		var raw = d[k]
+		match typeof(options[k]):
+			TYPE_INT:    options[k] = int(raw)
+			TYPE_FLOAT:  options[k] = float(raw)
+			TYPE_BOOL:   options[k] = bool(raw)
+			TYPE_STRING: options[k] = str(raw)
+			_:           options[k] = raw
 	emit_signal("options_changed")
