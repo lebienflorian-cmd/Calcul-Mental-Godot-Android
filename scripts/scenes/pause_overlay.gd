@@ -7,8 +7,8 @@ signal replayed
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var vp := get_viewport_rect().size
-	var pw := min(vp.x * 0.88, 600.0)
-	var ph := min(vp.y * 0.82, 680.0)
+	var pw := min(vp.x * 0.94, 1100.0)
+	var ph := min(vp.y * 0.9, 1300.0)
 
 	# Fond sombre
 	var bg := ColorRect.new()
@@ -37,7 +37,7 @@ func _ready() -> void:
 	var title := Label.new()
 	title.text = "⏸  PAUSE"
 	title.add_theme_color_override("font_color", ThemeManager.TEXT)
-	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
+	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_TITLE * 4.0)))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vb.add_child(title)
 
@@ -45,7 +45,7 @@ func _ready() -> void:
 	music_cb.text = "Musique"
 	music_cb.button_pressed = GameState.options.music_enabled
 	music_cb.add_theme_color_override("font_color", ThemeManager.TEXT)
-	music_cb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	music_cb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	music_cb.toggled.connect(func(p: bool):
 		GameState.set_option("music_enabled", p)
 		if p: AudioManager.play_music("game")
@@ -57,7 +57,7 @@ func _ready() -> void:
 	sfx_cb.text = "Bruitages"
 	sfx_cb.button_pressed = GameState.options.sfx_enabled
 	sfx_cb.add_theme_color_override("font_color", ThemeManager.TEXT)
-	sfx_cb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	sfx_cb.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_MED * 4.0)))
 	sfx_cb.toggled.connect(func(p: bool): GameState.set_option("sfx_enabled", p))
 	vb.add_child(sfx_cb)
 
@@ -82,9 +82,9 @@ func _notification(what: int) -> void:
 func _add_button(parent: Node, label: String, color: Color, cb: Callable) -> void:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 72)
+	b.custom_minimum_size = Vector2(0, 288)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(int(ThemeManager.FONT_LARGE * 4.0)))
 	b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(color, 12))
 	b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(color.lightened(0.1), 12))
 	b.add_theme_stylebox_override("pressed",ThemeManager.make_button_style(color.darkened(0.15), 12))
