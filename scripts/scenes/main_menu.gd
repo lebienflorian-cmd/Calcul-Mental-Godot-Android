@@ -22,10 +22,11 @@ func _ready() -> void:
 	set_process(true)
 
 func _build_ui() -> void:
-	var vp  := get_viewport_rect().size
-	var vw  := vp.x
+	var vp := get_viewport_rect().size
+	var vw := vp.x
 	var margin := maxf(20.0, vw * 0.05)
-	# Conteneur principal pleine largeur
+	var safe_top := maxf(60.0, DisplayServer.screen_get_usable_rect().position.y + 24.0)
+
 	var root := VBoxContainer.new()
 	root.anchor_left = 0.0
 	root.anchor_right = 1.0
@@ -33,54 +34,176 @@ func _build_ui() -> void:
 	root.anchor_bottom = 1.0
 	root.offset_left = margin
 	root.offset_right = -margin
-	root.offset_top = 60
-	root.offset_bottom = -40
-	root.add_theme_constant_override("separation", 14)
+	root.offset_top = safe_top
+	root.offset_bottom = -safe_top
 	add_child(root)
 
-	# Titre
-	_title_label = Label.new()
-	_title_label.text = "🧮  Calcul Mental"
-	_title_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	_title_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
-	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	root.add_child(_title_label)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 12)
+	root.add_child(content)
 
-	# Espacement
-	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 20)
-	root.add_child(spacer)
+	var header := VBoxContainer.new()
+	header.alignment = BoxContainer.ALIGNMENT_CENTER
+	header.add_theme_constant_override("separation", 8)
+	content.add_child(header)
 
-	# Boutons principaux
-	_add_menu_button(root, "▶  Jouer",          ThemeManager.ACCENT,   _on_play)
-	_add_menu_button(root, "⚙  Options",        ThemeManager.SURFACE_2, _on_options)
-	_add_menu_button(root, "📖  Règles du jeu", ThemeManager.SURFACE_2, _on_rules)
-	_add_menu_button(root, "📊  Scores",        ThemeManager.SURFACE_2, _on_scores)
-	_add_menu_button(root, "✕  Quitter",        ThemeManager.SURFACE_2, _on_quit)
+	var icon_panel := PanelContainer.new()
+	icon_panel.custom_minimum_size = Vector2(96, 96)
+	icon_panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 24))
+	header.add_child(icon_panel)
 
-	# Profil affiché en bas
-	var prof := Label.new()
-	prof.text = "Profil : %s" % ProfileManager.current_profile
-	prof.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	prof.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
-	prof.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	root.add_child(prof)
-	ProfileManager.profile_changed.connect(func(n): prof.text = "Profil : %s" % n)
+	var icon_center := CenterContainer.new()
+	icon_panel.add_child(icon_center)
+	var icon_label := Label.new()
+	icon_label.text = "🧮"
+	icon_label.add_theme_color_override("font_color", ThemeManager.TEXT)
+	icon_label.add_theme_font_size_override("font_size", 96)
+	icon_center.add_child(icon_label)
 
-	# Bouton "changer fond" en haut à droite
-	var bg_btn := Button.new()
-	bg_btn.text = "✦"
-	bg_btn.size = Vector2(56, 56)
-	bg_btn.position = Vector2(get_viewport_rect().size.x - 72, 16)
-	bg_btn.add_theme_color_override("font_color", ThemeManager.TEXT)
-	bg_btn.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
-	bg_btn.tooltip_text = "Changer le fond animé"
-	var sb := ThemeManager.make_button_style(ThemeManager.SURFACE_2, 28)
-	bg_btn.add_theme_stylebox_override("normal", sb)
-	bg_btn.add_theme_stylebox_override("hover", ThemeManager.make_button_style(ThemeManager.BORDER, 28))
-	bg_btn.add_theme_stylebox_override("pressed", ThemeManager.make_button_style(ThemeManager.ACCENT, 28))
-	bg_btn.pressed.connect(_on_toggle_bg)
-	add_child(bg_btn)
+	var logo_gap := Control.new()
+	logo_gap.custom_minimum_size = Vector2(0, 24)
+	header.add_child(logo_gap)
+
+	var title_row := HBoxContainer.new()
+	title_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	title_row.add_theme_constant_override("separation", 10)
+	header.add_child(title_row)
+
+	var title_calc := Label.new()
+	title_calc.text = "Calcul"
+	title_calc.add_theme_color_override("font_color", ThemeManager.TEXT)
+	title_calc.add_theme_font_size_override("font_size", ThemeManager.scaled_i(56))
+	title_calc.add_theme_font_override("font", ThemeDB.fallback_font)
+	title_row.add_child(title_calc)
+
+	var title_mental := Label.new()
+	title_mental.text = "Mental"
+	title_mental.add_theme_color_override("font_color", ThemeManager.ACCENT)
+	title_mental.add_theme_font_size_override("font_size", ThemeManager.scaled_i(56))
+	title_mental.add_theme_font_override("font", ThemeDB.fallback_font)
+	title_row.add_child(title_mental)
+
+	var subtitle := Label.new()
+	subtitle.text = "Entraîne ta rapidité et ta précision"
+	subtitle.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
+	subtitle.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	header.add_child(subtitle)
+
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 32)
+	content.add_child(gap)
+
+	var menu_list := VBoxContainer.new()
+	menu_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	menu_list.add_theme_constant_override("separation", 16)
+	content.add_child(menu_list)
+
+	_add_menu_card(menu_list, "▶", Color(1, 1, 1, 0.15), "Jouer", _on_play, true)
+	_add_menu_card(menu_list, "⚙", ThemeManager.ACCENT, "Options", _on_options, false)
+	_add_menu_card(menu_list, "📖", Color("#F59E0B"), "Règles du jeu", _on_rules, false)
+	_add_menu_card(menu_list, "📊", ThemeManager.SUCCESS, "Scores", _on_scores, false)
+	_add_menu_card(menu_list, "⏻", ThemeManager.ERROR, "Quitter", _on_quit, false)
+
+	var profile_top_gap := Control.new()
+	profile_top_gap.custom_minimum_size = Vector2(0, 52)
+	content.add_child(profile_top_gap)
+
+	var profile_wrap := CenterContainer.new()
+	profile_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(profile_wrap)
+
+	var profile_panel := PanelContainer.new()
+	profile_panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(Color(ThemeManager.SURFACE_2.r, ThemeManager.SURFACE_2.g, ThemeManager.SURFACE_2.b, 0.5), 20))
+	profile_wrap.add_child(profile_panel)
+
+	var profile_row := HBoxContainer.new()
+	profile_row.add_theme_constant_override("separation", 6)
+	profile_panel.add_child(profile_row)
+
+	var p_icon := Label.new()
+	p_icon.text = "👤"
+	p_icon.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	profile_row.add_child(p_icon)
+
+	var p_prefix := Label.new()
+	p_prefix.text = "Profil actif : "
+	p_prefix.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
+	p_prefix.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	profile_row.add_child(p_prefix)
+
+	var p_name := Label.new()
+	p_name.text = ProfileManager.current_profile
+	p_name.add_theme_color_override("font_color", ThemeManager.ACCENT)
+	p_name.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	profile_row.add_child(p_name)
+	ProfileManager.profile_changed.connect(func(n): p_name.text = n)
+
+	profile_panel.add_theme_constant_override("margin_left", 16)
+	profile_panel.add_theme_constant_override("margin_right", 16)
+	profile_panel.add_theme_constant_override("margin_top", 8)
+	profile_panel.add_theme_constant_override("margin_bottom", 8)
+
+func _add_menu_card(parent: Node, icon_emoji: String, icon_bg_color: Color, label: String, cb: Callable, is_primary: bool) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(0, 64)
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var bg := ThemeManager.ACCENT if is_primary else ThemeManager.SURFACE_2
+	var border := Color(ThemeManager.BORDER.r, ThemeManager.BORDER.g, ThemeManager.BORDER.b, 0.8)
+	var style := ThemeManager.make_panel_style(bg, 16)
+	style.border_color = border
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	card.add_theme_stylebox_override("panel", style)
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			AudioManager.play_sfx("click")
+			cb.call()
+	)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	card.add_child(row)
+	card.add_theme_constant_override("margin_left", 16)
+	card.add_theme_constant_override("margin_right", 16)
+	card.add_theme_constant_override("margin_top", 10)
+	card.add_theme_constant_override("margin_bottom", 10)
+
+	var icon_tile := PanelContainer.new()
+	icon_tile.custom_minimum_size = Vector2(44, 44)
+	icon_tile.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(icon_bg_color, 999 if is_primary else 12))
+	row.add_child(icon_tile)
+
+	var icon_center := CenterContainer.new()
+	icon_tile.add_child(icon_center)
+	var icon := Label.new()
+	icon.text = icon_emoji
+	icon.add_theme_font_size_override("font_size", 28)
+	icon_center.add_child(icon)
+
+	var text := Label.new()
+	text.text = label
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	text.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	text.add_theme_color_override("font_color", ThemeManager.TEXT if not is_primary else Color.WHITE)
+	row.add_child(text)
+
+	var chevron := Label.new()
+	chevron.text = "›"
+	chevron.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	chevron.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	chevron.add_theme_color_override("font_color", ThemeManager.TEXT_DIM if not is_primary else Color.WHITE)
+	row.add_child(chevron)
+
+	parent.add_child(card)
+	return card
 
 func _add_menu_button(parent: Node, label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
@@ -115,12 +238,6 @@ func _on_scores() -> void:
 func _on_quit() -> void:
 	_confirm_quit()
 
-func _on_toggle_bg() -> void:
-	_bg_style = (_bg_style + 1) % 2
-	AudioManager.play_sfx("step")
-	if _bg_style == 1:
-		_symbols.clear()
-		_init_bokeh()
 
 # ---- Fond animé ----
 func _init_background() -> void:
