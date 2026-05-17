@@ -102,7 +102,7 @@ func _build_ui() -> void:
 	back.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(ThemeManager.BORDER, 10))
 	back.pressed.connect(func():
 		AudioManager.play_sfx("back")
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
 	)
 	add_child(back)
 
@@ -134,8 +134,8 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.back("res://scenes/MainMenu.tscn")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")

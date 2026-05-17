@@ -7,8 +7,8 @@ signal replayed
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var vp := get_viewport_rect().size
-	var pw := min(vp.x * 0.88, 600.0)
-	var ph := min(vp.y * 0.82, 680.0)
+	var pw := min(vp.x * 0.96, 1200.0)
+	var ph := min(vp.y * 0.90, 1800.0)
 
 	# Fond sombre
 	var bg := ColorRect.new()
@@ -37,7 +37,7 @@ func _ready() -> void:
 	var title := Label.new()
 	title.text = "⏸  PAUSE"
 	title.add_theme_color_override("font_color", ThemeManager.TEXT)
-	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE))
+	title.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_TITLE * 2))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vb.add_child(title)
 
@@ -82,9 +82,9 @@ func _notification(what: int) -> void:
 func _add_button(parent: Node, label: String, color: Color, cb: Callable) -> void:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 72)
+	b.custom_minimum_size = Vector2(0, 280)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE * 2))
 	b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(color, 12))
 	b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(color.lightened(0.1), 12))
 	b.add_theme_stylebox_override("pressed",ThemeManager.make_button_style(color.darkened(0.15), 12))

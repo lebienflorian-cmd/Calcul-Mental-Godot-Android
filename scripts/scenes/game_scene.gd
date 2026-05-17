@@ -94,15 +94,17 @@ func _build_ui() -> void:
 
 	top_label = Label.new()
 	top_label.add_theme_color_override("font_color", ThemeManager.TEXT)
-	top_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
+	top_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE * 2))
 	top_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	top_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top_hb.add_child(top_label)
 
 	top_right_label = Label.new()
 	top_right_label.add_theme_color_override("font_color", ThemeManager.ACCENT_2)
-	top_right_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE))
+	top_right_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE * 2))
 	top_right_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	top_right_label.position.x -= 24
 	top_hb.add_child(top_right_label)
 
 	# Panneau calcul — premier tiers de l'écran (sous la barre)
@@ -125,7 +127,7 @@ func _build_ui() -> void:
 	var hdr := Label.new()
 	hdr.text = "Calculez mentalement :"
 	hdr.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	hdr.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	hdr.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
 	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	calc_vb.add_child(hdr)
 
@@ -274,7 +276,7 @@ func _build_ui() -> void:
 	hint_label.offset_bottom = -8
 	hint_label.text = "Entrée : valider — ‖ : pause"
 	hint_label.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	hint_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	hint_label.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_MED))
 	add_child(hint_label)
 
 # ============================================================
@@ -489,4 +491,4 @@ func _on_tts_finished() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if pause_overlay != null: return
-		_on_pause()
+		SceneRouter.back("res://scenes/MainMenu.tscn")
