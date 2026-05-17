@@ -35,7 +35,7 @@ func _build_ui() -> void:
 	root.offset_left = margin
 	root.offset_right = -margin
 	root.offset_top = safe_top
-	root.offset_bottom = -24
+	root.offset_bottom = -safe_top
 	add_child(root)
 
 	var content := VBoxContainer.new()
@@ -47,12 +47,12 @@ func _build_ui() -> void:
 
 	var header := VBoxContainer.new()
 	header.alignment = BoxContainer.ALIGNMENT_CENTER
-	header.add_theme_constant_override("separation", 10)
+	header.add_theme_constant_override("separation", 8)
 	content.add_child(header)
 
 	var icon_panel := PanelContainer.new()
 	icon_panel.custom_minimum_size = Vector2(96, 96)
-	icon_panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 20))
+	icon_panel.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(ThemeManager.SURFACE, 24))
 	header.add_child(icon_panel)
 
 	var icon_center := CenterContainer.new()
@@ -62,6 +62,10 @@ func _build_ui() -> void:
 	icon_label.add_theme_color_override("font_color", ThemeManager.TEXT)
 	icon_label.add_theme_font_size_override("font_size", 96)
 	icon_center.add_child(icon_label)
+
+	var logo_gap := Control.new()
+	logo_gap.custom_minimum_size = Vector2(0, 24)
+	header.add_child(logo_gap)
 
 	var title_row := HBoxContainer.new()
 	title_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -95,7 +99,7 @@ func _build_ui() -> void:
 
 	var menu_list := VBoxContainer.new()
 	menu_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	menu_list.add_theme_constant_override("separation", 12)
+	menu_list.add_theme_constant_override("separation", 16)
 	content.add_child(menu_list)
 
 	_add_menu_card(menu_list, "▶", Color(1, 1, 1, 0.15), "Jouer", _on_play, true)
@@ -103,6 +107,10 @@ func _build_ui() -> void:
 	_add_menu_card(menu_list, "📖", Color("#F59E0B"), "Règles du jeu", _on_rules, false)
 	_add_menu_card(menu_list, "📊", ThemeManager.SUCCESS, "Scores", _on_scores, false)
 	_add_menu_card(menu_list, "⏻", ThemeManager.ERROR, "Quitter", _on_quit, false)
+
+	var profile_top_gap := Control.new()
+	profile_top_gap.custom_minimum_size = Vector2(0, 52)
+	content.add_child(profile_top_gap)
 
 	var profile_wrap := CenterContainer.new()
 	profile_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -134,14 +142,14 @@ func _build_ui() -> void:
 	profile_row.add_child(p_name)
 	ProfileManager.profile_changed.connect(func(n): p_name.text = n)
 
-	profile_panel.add_theme_constant_override("margin_left", 12)
-	profile_panel.add_theme_constant_override("margin_right", 12)
+	profile_panel.add_theme_constant_override("margin_left", 16)
+	profile_panel.add_theme_constant_override("margin_right", 16)
 	profile_panel.add_theme_constant_override("margin_top", 8)
 	profile_panel.add_theme_constant_override("margin_bottom", 8)
 
 func _add_menu_card(parent: Node, icon_emoji: String, icon_bg_color: Color, label: String, cb: Callable, is_primary: bool) -> PanelContainer:
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(0, 78)
+	card.custom_minimum_size = Vector2(0, 64)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var bg := ThemeManager.ACCENT if is_primary else ThemeManager.SURFACE_2
 	var border := Color(ThemeManager.BORDER.r, ThemeManager.BORDER.g, ThemeManager.BORDER.b, 0.8)
@@ -160,16 +168,16 @@ func _add_menu_card(parent: Node, icon_emoji: String, icon_bg_color: Color, labe
 	)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 14)
+	row.add_theme_constant_override("separation", 16)
 	card.add_child(row)
 	card.add_theme_constant_override("margin_left", 16)
 	card.add_theme_constant_override("margin_right", 16)
-	card.add_theme_constant_override("margin_top", 13)
-	card.add_theme_constant_override("margin_bottom", 13)
+	card.add_theme_constant_override("margin_top", 10)
+	card.add_theme_constant_override("margin_bottom", 10)
 
 	var icon_tile := PanelContainer.new()
-	icon_tile.custom_minimum_size = Vector2(52, 52)
-	icon_tile.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(icon_bg_color, 14))
+	icon_tile.custom_minimum_size = Vector2(44, 44)
+	icon_tile.add_theme_stylebox_override("panel", ThemeManager.make_panel_style(icon_bg_color, 999 if is_primary else 12))
 	row.add_child(icon_tile)
 
 	var icon_center := CenterContainer.new()
