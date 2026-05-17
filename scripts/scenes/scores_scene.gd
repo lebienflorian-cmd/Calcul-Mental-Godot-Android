@@ -32,16 +32,16 @@ func _build_ui() -> void:
 	title.anchor_right = 1.0
 	title.offset_left = 16
 	title.offset_right = -16
-	title.offset_top = 16
-	title.offset_bottom = 80
+	title.offset_top = 24
+	title.offset_bottom = 140
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
 	_scroll = ScrollContainer.new()
 	_scroll.anchor_right = 1.0
 	_scroll.anchor_bottom = 1.0
-	_scroll.offset_top = 90
-	_scroll.offset_bottom = -90
+	_scroll.offset_top = 160
+	_scroll.offset_bottom = -220
 	_scroll.offset_left = 20
 	_scroll.offset_right = -20
 	add_child(_scroll)
@@ -150,7 +150,7 @@ func _build_ui() -> void:
 	bottom.anchor_bottom = 1.0
 	bottom.offset_left = 20
 	bottom.offset_right = -20
-	bottom.offset_top = -76
+	bottom.offset_top = -200
 	bottom.offset_bottom = -16
 	bottom.add_theme_constant_override("separation", 12)
 	add_child(bottom)
@@ -186,9 +186,9 @@ func _row_cell(parent: Node, text: String, color: Color, weight: int) -> void:
 func _make_btn(label: String, color: Color, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(0, 56)
+	b.custom_minimum_size = Vector2(0, 192)
 	b.add_theme_color_override("font_color", ThemeManager.TEXT)
-	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
+	b.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_LARGE * 2))
 	b.add_theme_stylebox_override("normal", ThemeManager.make_button_style(color, 10))
 	b.add_theme_stylebox_override("hover",  ThemeManager.make_button_style(color.lightened(0.1), 10))
 	b.add_theme_stylebox_override("pressed",ThemeManager.make_button_style(color.darkened(0.15), 10))
@@ -283,11 +283,11 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.back("res://scenes/MainMenu.tscn")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
 
 # ============================================================
 # Sous-classe : graphique simple

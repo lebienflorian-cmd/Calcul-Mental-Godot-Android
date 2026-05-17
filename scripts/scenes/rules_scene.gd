@@ -134,8 +134,8 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ESCAPE or event.keycode == KEY_BACK:
 			get_viewport().set_input_as_handled()
-			SceneRouter.goto("res://scenes/MainMenu.tscn")
+			SceneRouter.back("res://scenes/MainMenu.tscn")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		SceneRouter.goto("res://scenes/MainMenu.tscn")
+		SceneRouter.back("res://scenes/MainMenu.tscn")
