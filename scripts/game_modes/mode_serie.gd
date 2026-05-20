@@ -6,6 +6,7 @@ var done_count: int = 0
 var start_time: int = 0
 var current_target: float = 0.0
 var current_expr: String = ""
+var current_tree: Dictionary = {}
 
 func start() -> void:
 	target_count = GameState.options.target_count
@@ -22,7 +23,8 @@ func _next_calc() -> void:
 	var d := CalcGenerator.generate()
 	current_target = d.value
 	current_expr = d.expr_str
-	scene.show_calc(d.expr_str, GameState.options.hide_calc)
+	current_tree = d.get("tree", {})
+	scene.show_calc(d.expr_str, GameState.options.hide_calc, current_tree)
 	if GameState.options.audio_enabled:
 		VoiceManager.speak(d.expr_str)
 

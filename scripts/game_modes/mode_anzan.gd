@@ -52,10 +52,13 @@ func _play_numbers() -> void:
 	awaiting_answer = true
 
 func _delay_per_level() -> float:
-	# Plus le niveau (level interne) est élevé, plus c'est rapide.
-	var lvl: int = GameState.session.level
-	var d := 1.2 - 0.15 * float(lvl)
-	return clamp(d, 0.3, 1.5)
+	var lvl: int = int(GameState.options.anzan_level)
+	match lvl:
+		0: return 1.5
+		1: return 1.0
+		3: return 0.5
+		4: return 0.3
+		_: return 0.7  # 2 = moyen
 
 func handle_submit(text: String) -> void:
 	if not awaiting_answer: return

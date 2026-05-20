@@ -6,11 +6,11 @@ var n_back: int = 2
 var tempo: int = 1
 var queue: Array = []  # FIFO de {expr, target}
 var time_left: float = 90.0
-var time_since_calc: float = 0.0
 var current_expr: String = ""
 var current_target: float = 0.0
 var current_index: int = 0
 var awaiting_answer: bool = false
+var _interval_timer: Timer = null
 
 func start() -> void:
 	n_back = GameState.options.infernal_n
@@ -22,12 +22,20 @@ func start() -> void:
 
 func _begin() -> void:
 	set_process(true)
+	_interval_timer = Timer.new()
+	_interval_timer.wait_time = _interval()
+	_interval_timer.one_shot = false
+	_interval_timer.timeout.connect(_show_new_calc)
+	add_child(_interval_timer)
 	_show_new_calc()
+	_interval_timer.start()
 
 func _interval() -> float:
 	match tempo:
 		0: return 4.0  # lent
 		2: return 2.0  # rapide
+		3: return 1.5  # très rapide
+		4: return 1.0  # extrême
 		_: return 3.0  # moyen
 
 func _process(delta: float) -> void:
@@ -35,25 +43,31 @@ func _process(delta: float) -> void:
 	scene.top_right_label.text = "%05.1f s" % max(0.0, time_left)
 	if time_left <= 0:
 		set_process(false)
+		if _interval_timer:
+			_interval_timer.stop()
 		scene.end_session()
 		return
-	time_since_calc += delta
-	if time_since_calc >= _interval():
-		time_since_calc = 0
-		_show_new_calc()
 
 func _show_new_calc() -> void:
+	# Player missed previous question (timer fired before they answered)
+	if awaiting_answer:
+		awaiting_answer = false
+		_record_and_feedback(current_expr, current_target, "")
+	AudioManager.play_sfx("anzan")
 	current_index += 1
 	var d := CalcGenerator.generate()
 	queue.append({"expr": d.expr_str, "target": d.value, "idx": current_index})
-	scene.calc_label.text = "[%d]  %s" % [current_index, d.expr_str]
+	var infernal_text := "[%d]  %s" % [current_index, d.expr_str]
+	scene.calc_renderer.fallback_text = infernal_text
+	scene.calc_renderer.expr_tree = {}
+	scene.calc_renderer.queue_redraw()
 	# Le joueur répond au calcul d'il y a N tours
 	if queue.size() > n_back:
 		var target_item = queue[queue.size() - 1 - n_back]
 		current_expr = target_item.expr
 		current_target = target_item.target
 		scene.second_label.text = "[%d]  ?  =" % target_item.idx
-		scene.show_calc(scene.calc_label.text, false)
+		scene.show_calc(infernal_text, false)
 		awaiting_answer = true
 	else:
 		scene.second_label.text = "..."
@@ -65,4 +79,7 @@ func handle_submit(text: String) -> void:
 	awaiting_answer = false
 	var _ok := _record_and_feedback(current_expr, current_target, text)
 	# Force le calcul suivant immédiatement
-	time_since_calc = _interval()
+	if _interval_timer:
+		_interval_timer.stop()
+		_show_new_calc()
+		_interval_timer.start()

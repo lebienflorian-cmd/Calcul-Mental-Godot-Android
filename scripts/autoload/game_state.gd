@@ -28,9 +28,10 @@ var options: Dictionary = {
 	"target_count": 20,
 	"flash_count":  10,
 	"flash_series": 3,
+	"anzan_level":  2,   # 0=très lent 1=lent 2=moyen 3=rapide 4=très rapide
 	"infernal_n":   2,
 	"infernal_duration": 90,
-	"infernal_tempo": 1, # 0 lent, 1 moyen, 2 rapide
+	"infernal_tempo": 1, # 0 lent 1 moyen 2 rapide 3 très rapide 4 extrême
 
 	# Opérations
 	"op_add": true,
@@ -70,10 +71,17 @@ var options: Dictionary = {
 	# Audio & voix
 	"audio_enabled":  false,
 	"tts_voice":      "default",
+	"tts_lang":       "fr",
 	"voice_input":    false,
 	"stt_lang":       "fr",
-	"hide_calc":      false,
-	"auto_validate":  false,
+	"stt_delay":      1.0,
+	"hide_calc":           false,
+	"show_fractions":      false,
+	"show_column":         false,
+	"show_neon":           false,
+	"show_parallax":       false,
+	"auto_validate":       false,
+	"auto_validate_delay": 1.5,
 
 	# Musique
 	"music_enabled": true,
@@ -138,6 +146,14 @@ func compute_final_stats() -> Dictionary:
 	var level: int = session.level
 	var score := 1000.0 * accuracy + 10.0 * correct + 20.0 * level - 5.0 * avg_time
 	score = max(0.0, score)
+	var difficulty_label := ""
+	match options.mode:
+		Mode.INFERNAL:
+			var tempo_names := ["Lent", "Moyen", "Rapide", "Très rapide", "Extrême"]
+			difficulty_label = tempo_names[clamp(int(options.infernal_tempo), 0, tempo_names.size() - 1)]
+		Mode.FLASH_ANZAN:
+			var anzan_names := ["Très lent", "Lent", "Moyen", "Rapide", "Très rapide"]
+			difficulty_label = anzan_names[clamp(int(options.anzan_level), 0, anzan_names.size() - 1)]
 	return {
 		"total": total,
 		"correct": correct,
@@ -148,6 +164,7 @@ func compute_final_stats() -> Dictionary:
 		"score": int(round(score)),
 		"mode": session.mode,
 		"date": Time.get_datetime_string_from_system(false, true),
+		"difficulty": difficulty_label,
 	}
 
 func set_option(key: String, value) -> void:

@@ -4,6 +4,7 @@ extends "res://scripts/game_modes/mode_base.gd"
 var time_left: float = 60.0
 var current_target: float = 0.0
 var current_expr: String = ""
+var current_tree: Dictionary = {}
 
 func start() -> void:
 	time_left = float(GameState.options.duration_sec)
@@ -15,7 +16,8 @@ func _next_calc() -> void:
 	var d := CalcGenerator.generate()
 	current_target = d.value
 	current_expr = d.expr_str
-	scene.show_calc(d.expr_str, GameState.options.hide_calc)
+	current_tree = d.get("tree", {})
+	scene.show_calc(d.expr_str, GameState.options.hide_calc, current_tree)
 	if GameState.options.audio_enabled:
 		VoiceManager.speak(d.expr_str)
 
@@ -30,7 +32,7 @@ func handle_submit(text: String) -> void:
 	var ok := _record_and_feedback(current_expr, current_target, text)
 	if not ok and GameState.options.repeat_until_ok:
 		# Reste sur la même question
-		scene.show_calc(current_expr, GameState.options.hide_calc)
+		scene.show_calc(current_expr, GameState.options.hide_calc, current_tree)
 		return
 	await get_tree().create_timer(0.4).timeout
 	if time_left > 0:

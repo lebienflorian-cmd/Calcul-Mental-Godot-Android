@@ -51,7 +51,8 @@ func _generate_infernal() -> Dictionary:
 		var tmp := a; a = b; b = tmp
 		val = a - b
 	var expr := "%d %s %d" % [a, op, b]
-	return {"expr_str": expr, "value": float(val), "operands": [a, b], "ops": [op]}
+	return {"expr_str": expr, "value": float(val), "operands": [a, b], "ops": [op],
+			"tree": _build_tree([a, b], [op])}
 
 # ---- Génération classique ----
 func _generate_classic() -> Dictionary:
@@ -121,9 +122,10 @@ func _try_generate_classic() -> Dictionary:
 
 	return {
 		"expr_str": expr_str,
-		"value": float(value),
+		"value":    float(value),
 		"operands": operands,
-		"ops": ops,
+		"ops":      ops,
+		"tree":     _build_tree(operands, ops),
 	}
 
 # ---- Helpers ----
@@ -201,6 +203,24 @@ func _fix_no_borrow_sub(operands: Array) -> Array:
 		if db > da: db = da
 		new_b += str(db)
 	return [a, int(new_b)]
+
+func _build_tree(operands: Array, ops: Array) -> Dictionary:
+	var nums: Array = []
+	for v in operands:
+		nums.append({"type": "num", "v": v})
+	var oplist := ops.duplicate()
+	var i := 0
+	while i < oplist.size():
+		if oplist[i] == OP_MUL or oplist[i] == OP_DIV:
+			nums[i] = {"type": "op", "op": oplist[i], "left": nums[i], "right": nums[i + 1]}
+			nums.remove_at(i + 1)
+			oplist.remove_at(i)
+		else:
+			i += 1
+	var result: Dictionary = nums[0]
+	for j in oplist.size():
+		result = {"type": "op", "op": oplist[j], "left": result, "right": nums[j + 1]}
+	return result
 
 func _build_expr(operands: Array, ops: Array, use_paren: bool) -> String:
 	var s := str(operands[0])

@@ -14,9 +14,14 @@ signal profile_changed(name: String)
 
 func _ready() -> void:
 	_load()
-	# S'assurer que Défaut existe
+	# S'assurer que Défaut existe et est verrouillé
 	if not profiles.has(DEFAULT_PROFILE):
-		profiles[DEFAULT_PROFILE] = {"options": GameState.options_to_dict()}
+		profiles[DEFAULT_PROFILE] = {"options": GameState.options_to_dict(), "locked": true, "mode": 0}
+		_save()
+	elif not profiles[DEFAULT_PROFILE].has("locked"):
+		profiles[DEFAULT_PROFILE]["locked"] = true
+		if not profiles[DEFAULT_PROFILE].has("mode"):
+			profiles[DEFAULT_PROFILE]["mode"] = int(profiles[DEFAULT_PROFILE].get("options", {}).get("mode", 0))
 		_save()
 	# Charger les options du profil courant
 	apply_current_to_state()
@@ -62,15 +67,32 @@ func save_current_options() -> void:
 
 func switch_to(name: String) -> void:
 	if not profiles.has(name): return
+	if is_locked(current_profile):
+		save_current_options()   # persist mode-param tweaks for locked profiles
 	current_profile = name
 	apply_current_to_state()
 	_save()
 	emit_signal("profile_changed", name)
 
+func is_locked(name: String) -> bool:
+	if not profiles.has(name): return false
+	return bool(profiles[name].get("locked", false))
+
+func get_profile_mode(name: String) -> int:
+	if not profiles.has(name): return 0
+	return int(profiles[name].get("mode", 0))
+
+func lock_and_save(name: String) -> void:
+	if not profiles.has(name): return
+	profiles[name]["options"] = GameState.options_to_dict()
+	profiles[name]["locked"]  = true
+	profiles[name]["mode"]    = int(GameState.options.mode)
+	_save()
+
 func create_profile(name: String) -> bool:
 	if name.strip_edges() == "": return false
 	if profiles.has(name): return false
-	profiles[name] = {"options": GameState.options_to_dict()}
+	profiles[name] = {"options": GameState.options_to_dict(), "locked": false, "mode": int(GameState.options.mode)}
 	_save()
 	return true
 
@@ -94,4 +116,5 @@ func delete_profile(name: String) -> bool:
 		current_profile = DEFAULT_PROFILE
 		apply_current_to_state()
 	_save()
+	emit_signal("profile_changed", current_profile)
 	return true

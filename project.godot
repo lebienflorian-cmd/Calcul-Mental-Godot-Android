@@ -17,8 +17,9 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 config/name="Calcul Mental"
 config/description="Entraînement au calcul mental — 5 modes, profils, scores"
 run/main_scene="res://scenes/Main.tscn"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="uid://gml0pb0mccpv"
 
 [autoload]
 
@@ -55,6 +56,5 @@ ui_pause={
 
 [rendering]
 
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
+renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
