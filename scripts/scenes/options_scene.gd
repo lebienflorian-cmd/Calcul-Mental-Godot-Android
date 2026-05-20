@@ -1219,10 +1219,10 @@ func _apply_profile_lock() -> void:
 			body.add_child(ov)
 		elif not locked and existing != null:
 			existing.queue_free()
-	# Mode dropdown : seul le sélecteur de mode est verrouillé, pas les sous-options
+	# Le sélecteur de mode reste toujours interactif pour naviguer entre profils des modes.
 	if is_instance_valid(_mode_dd):
-		_mode_dd.disabled = locked
-		_mode_dd.modulate.a = 0.5 if locked else 1.0
+		_mode_dd.disabled = false
+		_mode_dd.modulate.a = 1.0
 
 func _make_lock_overlay() -> Control:
 	var ov := Control.new()
