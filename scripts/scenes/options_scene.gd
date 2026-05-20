@@ -1219,10 +1219,10 @@ func _apply_profile_lock() -> void:
 			body.add_child(ov)
 		elif not locked and existing != null:
 			existing.queue_free()
-	# Mode dropdown : seul le sélecteur de mode est verrouillé, pas les sous-options
+	# Le mode doit rester modifiable, même profil verrouillé.
 	if is_instance_valid(_mode_dd):
-		_mode_dd.disabled = locked
-		_mode_dd.modulate.a = 0.5 if locked else 1.0
+		_mode_dd.disabled = false
+		_mode_dd.modulate.a = 1.0
 
 func _make_lock_overlay() -> Control:
 	var ov := Control.new()
@@ -1233,17 +1233,6 @@ func _make_lock_overlay() -> Control:
 	dim.anchor_right = 1.0; dim.anchor_bottom = 1.0
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ov.add_child(dim)
-	var center := CenterContainer.new()
-	center.anchor_right = 1.0; center.anchor_bottom = 1.0
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ov.add_child(center)
-	var lbl := Label.new()
-	lbl.text = "🔒  Options verrouillées"
-	lbl.add_theme_color_override("font_color", ThemeManager.TEXT_DIM)
-	lbl.add_theme_font_size_override("font_size", ThemeManager.scaled_i(ThemeManager.FONT_SMALL))
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	center.add_child(lbl)
 	return ov
 
 # ────────────────────────────────────────────────────────────
