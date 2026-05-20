@@ -294,6 +294,7 @@ func _build_section_profil() -> void:
 	vb.add_theme_constant_override("separation",
 			ThemeManager.scaled_i(ThemeManager.SPACING_MD))
 	card.add_child(vb)
+	_lockable_bodies.append(vb)
 
 	# Ligne du haut : icône utilisateur + "Profil actif" + nom
 	var top := HBoxContainer.new()
@@ -1219,10 +1220,10 @@ func _apply_profile_lock() -> void:
 			body.add_child(ov)
 		elif not locked and existing != null:
 			existing.queue_free()
-	# Mode dropdown : seul le sélecteur de mode est verrouillé, pas les sous-options
+	# Le mode de jeu doit rester navigable même avec profil verrouillé.
 	if is_instance_valid(_mode_dd):
-		_mode_dd.disabled = locked
-		_mode_dd.modulate.a = 0.5 if locked else 1.0
+		_mode_dd.disabled = false
+		_mode_dd.modulate.a = 1.0
 
 func _make_lock_overlay() -> Control:
 	var ov := Control.new()

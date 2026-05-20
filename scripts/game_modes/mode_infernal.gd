@@ -52,7 +52,10 @@ func _show_new_calc() -> void:
 	# Player missed previous question (timer fired before they answered)
 	if awaiting_answer:
 		awaiting_answer = false
-		_record_and_feedback(current_expr, current_target, "")
+		var pending_text := ""
+		if is_instance_valid(scene) and is_instance_valid(scene.answer_input):
+			pending_text = scene.answer_input.text
+		_record_and_feedback(current_expr, current_target, pending_text)
 	AudioManager.play_sfx("anzan")
 	current_index += 1
 	var d := CalcGenerator.generate()
